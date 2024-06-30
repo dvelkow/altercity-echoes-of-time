@@ -2,7 +2,6 @@ import React, { useMemo, useCallback } from 'react';
 
 const CityImage = React.memo(({ cityStats }) => {
   const skyColor = '#87CEEB';
-  const grassColor = '#567d46';
   const waterColor = '#4a80aa';
 
   // Helper function to create a random color variation
@@ -37,16 +36,6 @@ const CityImage = React.memo(({ cityStats }) => {
     });
   }, []);
 
-  // Create distant mountains
-  const mountains = useMemo(() => {
-    return (
-      <g>
-        <path d="M0,300 Q250,100 500,300 T1000,250" fill="#3a4a6d" />
-        <path d="M-100,350 Q200,180 500,320 T1100,300" fill="#2a3a5d" />
-      </g>
-    );
-  }, []);
-
   // Create buildings
   const buildings = useMemo(() => {
     const buildingCount = Math.min(Math.floor(cityStats.population / 50000), 15);
@@ -74,25 +63,21 @@ const CityImage = React.memo(({ cityStats }) => {
     });
   }, [cityStats.population, pixelRect]);
 
-  // Create trees
-  const trees = useMemo(() => {
-    const treeCount = Math.floor((cityStats.environment / 100) * 20);
-    return Array(treeCount).fill().map((_, i) => {
+  // Create bushes
+  const bushes = useMemo(() => {
+    const bushCount = Math.floor((cityStats.environment / 100) * 20);
+    return Array(bushCount).fill().map((_, i) => {
       const x = Math.random() * 1000;
-      const y = 450 + Math.random() * 100;
-      const treeColor = colorVariation('#228B22', 30);
+      const bushColor = colorVariation('#228B22', 30);
       return (
         <g key={i}>
-          {pixelRect(x, y, 10, 30, '#8B4513')}
-          <polygon
-            points={`${x-15},${y} ${x+5},${y-40} ${x+25},${y}`}
-            fill={treeColor}
-            shapeRendering="crispEdges"
-          />
+          <circle cx={x} cy={550} r={10} fill={bushColor} />
+          <circle cx={x-5} cy={545} r={8} fill={bushColor} />
+          <circle cx={x+5} cy={545} r={8} fill={bushColor} />
         </g>
       );
     });
-  }, [cityStats.environment, colorVariation, pixelRect]);
+  }, [cityStats.environment, colorVariation]);
 
   // Create water elements
   const water = useMemo(() => {
@@ -133,11 +118,6 @@ const CityImage = React.memo(({ cityStats }) => {
     return (
       <g>
         {pixelRect(0, 580, 1000, 20, '#3a523a')}
-        {Array(50).fill().map((_, i) => (
-          <g key={i}>
-            {pixelRect(Math.random() * 1000, 570 + Math.random() * 30, 2, 2, ['#ff69b4', '#ffff00', '#ff6347'][Math.floor(Math.random() * 3)])}
-          </g>
-        ))}
       </g>
     );
   }, [pixelRect]);
@@ -240,7 +220,7 @@ const CityImage = React.memo(({ cityStats }) => {
     const humanCount = Math.floor(cityStats.population / 50000);
     const types = ['default', 'worker', 'business', 'artist'];
     return Array(humanCount).fill().map((_, i) => {
-      const y = 520 + Math.random() * 60;
+      const y = 560; // Set y to the middle of the road
       const type = types[Math.floor(Math.random() * types.length)];
       const direction = Math.random() < 0.5 ? 1 : -1; // 1 for right, -1 for left
       const speed = 50 + Math.random() * 100; // Random speed between 50 and 150
@@ -300,40 +280,20 @@ const CityImage = React.memo(({ cityStats }) => {
     });
   }, [cityStats.infrastructure, pixelRect]);
 
-  // Create city activities
-  const cityActivities = useMemo(() => {
-    const activityCount = Math.floor(cityStats.culture / 10);
-    return Array(activityCount).fill().map((_, i) => {
-      const x = 50 + Math.random() * 900;
-      const y = 500 + Math.random() * 80;
-      return (
-        <g key={i}>
-          {/* Represent an activity (e.g., market stall, street performance) */}
-          {pixelRect(x, y, 15, 15, colorVariation('#FFA500', 30))}
-          {/* People gathered around the activity */}
-          {createHuman(x-10, y+5, 'default')}
-          {createHuman(x+20, y+8, 'default')}
-        </g>
-      );
-    });
-  }, [cityStats.culture, pixelRect, colorVariation, createHuman]);
-
   return (
     <svg viewBox="0 0 1000 600" style={{ width: '100%', height: '100%' }}>
       <rect width="1000" height="600" fill={skyColor} />
       {clouds}
-      {mountains}
       {buildings}
-      {trees}
       {water}
       {birds}
       {foregroundDetails}
       {cityAtmosphere}
       {cityLights}
       {road}
+      {bushes}
       {vehicles}
       {humans}
-      {cityActivities}
     </svg>
   );
 });
